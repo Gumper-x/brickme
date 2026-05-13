@@ -1,0 +1,6 @@
+packages:
+  - 'packages/*'
+  - 'apps/*'
+shamefullyHoist: true
+sharedWorkspaceLockfile: false
+verifyDepsBeforeRun: false
