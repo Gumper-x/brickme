@@ -1,5 +1,5 @@
 {
-  "name": "@brickme/cli",
+  "name": "@brickme/utils",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
