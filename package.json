@@ -2,6 +2,7 @@
   "name": "brickflow",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@11.1.2",
   "scripts": {
     "dev:doc": "pnpm --filter doc dev --host",
     "dev:playground": "pnpm --filter playground dev --host",
@@ -11,7 +12,8 @@
     "test": "pnpm --filter playground test",
     "pack:update": "changeset",
     "pack:version": "changeset version",
-    "pack:publish": "pnpm build && changeset publish",
+    "pack:publish": "pnpm build && node ./scripts/publish-packages.mjs",
+    "pack:publish:dry": "pnpm build && node ./scripts/publish-packages.mjs --dry-run",
     "lint:fix": "pnpm --filter \"./apps/**\" --filter \"./packages/**\" --parallel --stream lint:fix",
     "lint": "pnpm --filter \"./apps/**\" --filter \"./packages/**\" --parallel --stream lint",
     "format": "pnpm --filter \"./apps/**\" --filter \"./packages/**\" --parallel --stream format",

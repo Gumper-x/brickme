@@ -1,6 +1,6 @@
 {
   "name": "@brickflow/utils",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "description": "Shared utility helpers for brickflow packages.",
   "sideEffects": false,
