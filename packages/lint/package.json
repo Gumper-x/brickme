@@ -1,10 +1,33 @@
 {
-  "name": "@brickme/lint",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "@brickflow/lint",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared ESLint configs for brickflow workspaces.",
+  "files": [
+    "index.js",
+    "nuxt.js"
+  ],
+  "exports": {
+    ".": "./index.js",
+    "./nuxt": "./nuxt.js"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "pnpm exec eslint .",
+    "lint:fix": "pnpm exec eslint . --fix",
+    "format": "pnpm exec prettier . --ignore-path ../../.prettierignore --write",
+    "format:check": "pnpm exec prettier . --ignore-path ../../.prettierignore --check"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.39.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.5.1",
+    "globals": "^16.4.0",
+    "typescript-eslint": "^8.46.1"
+  },
+  "peerDependencies": {
+    "eslint": ">=9",
+    "prettier": ">=3"
   },
   "author": "",
   "license": "ISC"

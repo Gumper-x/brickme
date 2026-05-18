@@ -1,10 +1,20 @@
 {
-  "name": "@brickme/cli",
-  "version": "1.0.0",
+  "name": "@brickflow/cli",
+  "version": "0.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "pnpm exec eslint .",
+    "lint:fix": "pnpm exec eslint . --fix",
+    "format": "pnpm exec prettier . --ignore-path ../../.prettierignore --write",
+    "format:check": "pnpm exec prettier . --ignore-path ../../.prettierignore --check"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@brickflow/lint": "workspace:*",
+    "@brickflow/prettier": "workspace:*"
   },
   "author": "",
   "license": "ISC"

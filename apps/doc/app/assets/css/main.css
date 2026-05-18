@@ -25,7 +25,7 @@
 
 .brick-landing .brick-hero::before,
 .brick-landing .brick-hero::after {
-  content: "";
+  content: '';
   position: absolute;
   border-radius: 999px;
   filter: blur(20px);
@@ -53,7 +53,12 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(110deg, rgba(5, 12, 24, 0.88) 18%, rgba(5, 12, 24, 0.54) 50%, rgba(5, 12, 24, 0.84) 100%),
+    linear-gradient(
+      110deg,
+      rgba(5, 12, 24, 0.88) 18%,
+      rgba(5, 12, 24, 0.54) 50%,
+      rgba(5, 12, 24, 0.84) 100%
+    ),
     url('/brick-hero.jpg') center right / cover no-repeat;
   transform: scale(1.02);
 }
@@ -162,7 +167,11 @@
   padding: 1.5rem;
   border: 1px solid rgba(130, 219, 255, 0.16);
   border-radius: 1.5rem;
-  background: linear-gradient(180deg, rgba(12, 27, 45, 0.88) 0%, rgba(6, 15, 28, 0.94) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(12, 27, 45, 0.88) 0%,
+    rgba(6, 15, 28, 0.94) 100%
+  );
   box-shadow:
     0 16px 50px rgba(1, 7, 17, 0.52),
     0 0 0 1px rgba(92, 208, 255, 0.04) inset;
@@ -188,7 +197,11 @@
   width: 3rem;
   height: 3rem;
   border-radius: 1rem;
-  background: linear-gradient(135deg, rgba(86, 230, 255, 0.24), rgba(78, 124, 255, 0.16));
+  background: linear-gradient(
+    135deg,
+    rgba(86, 230, 255, 0.24),
+    rgba(78, 124, 255, 0.16)
+  );
   color: #a8f5ff;
   font-size: 1.15rem;
   font-weight: 700;

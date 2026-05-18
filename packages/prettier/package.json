@@ -1,10 +1,21 @@
 {
-  "name": "@brickme/prettier",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "@brickflow/prettier",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared Prettier config for brickflow workspaces.",
+  "files": [
+    "index.js"
+  ],
+  "exports": "./index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "pnpm exec eslint .",
+    "lint:fix": "pnpm exec eslint . --fix",
+    "format": "pnpm exec prettier . --ignore-path ../../.prettierignore --write",
+    "format:check": "pnpm exec prettier . --ignore-path ../../.prettierignore --check"
+  },
+  "peerDependencies": {
+    "prettier": ">=3"
   },
   "author": "",
   "license": "ISC"

@@ -1,10 +1,27 @@
 {
   "name": "playground",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "NODE_OPTIONS='--conditions=development' nuxt dev",
+    "build": "nuxt build",
+    "typecheck": "nuxt typecheck",
+    "test": "nuxt prepare && vitest run",
+    "lint": "pnpm exec eslint .",
+    "lint:fix": "pnpm exec eslint . --fix",
+    "format": "pnpm exec prettier . --ignore-path ../../.prettierignore --write",
+    "format:check": "pnpm exec prettier . --ignore-path ../../.prettierignore --check"
+  },
+  "dependencies": {
+    "@brickflow/ui": "workspace:*",
+    "nuxt": "^4.3.1"
+  },
+  "devDependencies": {
+    "@brickflow/lint": "workspace:*",
+    "@brickflow/prettier": "workspace:*",
+    "@nuxt/test-utils": "^3.19.2",
+    "vitest": "^3.2.4",
+    "vue-tsc": "^3.1.1"
   },
   "author": "",
   "license": "ISC"

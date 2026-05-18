@@ -1,10 +1,38 @@
 {
-  "name": "@brickme/utils",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "@brickflow/utils",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Shared utility helpers for brickflow packages.",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    }
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rolldown -c build.config.ts",
+    "typecheck": "tsc --project tsconfig.json",
+    "lint": "pnpm exec eslint .",
+    "lint:fix": "pnpm exec eslint . --fix",
+    "format": "pnpm exec prettier . --ignore-path ../../.prettierignore --write",
+    "format:check": "pnpm exec prettier . --ignore-path ../../.prettierignore --check"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@brickflow/lint": "workspace:*",
+    "@brickflow/prettier": "workspace:*",
+    "rolldown": "^1.0.1",
+    "rolldown-plugin-dts": "^0.25.0"
   },
   "author": "",
   "license": "ISC"

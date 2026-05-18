@@ -1,33 +1,33 @@
 <script setup lang="ts">
 useSeoMeta({
-  title: "Brick",
+  title: 'Brick',
   description:
-    "Documentation for components, CLI tools, and code quality presets.",
-});
+    'Documentation for components, CLI tools, and code quality presets.',
+})
 
 const featureCards = [
   {
-    title: "Components",
+    title: 'Components',
     description:
-      "Reusable UI building blocks with a clean API and consistent visual language.",
-    to: "/essentials/components",
-    icon: "◌",
+      'Reusable UI building blocks with a clean API and consistent visual language.',
+    to: '/essentials/components',
+    icon: '◌',
   },
   {
-    title: "CLI",
+    title: 'CLI',
     description:
-      "Fast project commands for scaffolding, local workflows, and team-friendly automation.",
-    to: "/getting-started/installation",
-    icon: "⌘",
+      'Fast project commands for scaffolding, local workflows, and team-friendly automation.',
+    to: '/getting-started/installation',
+    icon: '⌘',
   },
   {
-    title: "ESLint & Prettier",
+    title: 'ESLint & Prettier',
     description:
-      "Opinionated linting and formatting rules to keep every Brick project predictable.",
-    to: "",
-    icon: "{}",
+      'Opinionated linting and formatting rules to keep every Brick project predictable.',
+    to: '',
+    icon: '{}',
   },
-];
+]
 </script>
 
 <template>
@@ -123,7 +123,7 @@ const featureCards = [
 
 .brick-hero::before,
 .brick-hero::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: auto;
   border-radius: 999px;
@@ -159,7 +159,7 @@ const featureCards = [
       rgba(5, 12, 24, 0.5) 50%,
       rgba(5, 12, 24, 0.82) 100%
     ),
-    url("/brick-hero.jpg") center right / cover no-repeat;
+    url('/brick-hero.jpg') center right / cover no-repeat;
   transform: scale(1.02);
 }
 

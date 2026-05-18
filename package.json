@@ -1,12 +1,28 @@
 {
-  "name": "brickme",
-  "version": "1.0.0",
+  "name": "brickflow",
+  "private": true,
+  "type": "module",
   "scripts": {
     "dev:doc": "pnpm --filter doc dev --host",
-    "dev:ui": "pnpm --filter @brickme/ui dev --host",
+    "dev:playground": "pnpm --filter playground dev --host",
+    "dev:ui": "pnpm dev:playground",
+    "build": "pnpm --recursive --filter \"./packages/**\" --if-present build",
+    "typecheck": "pnpm --recursive --filter \"./packages/**\" --filter \"./apps/**\" typecheck",
+    "test": "pnpm --filter playground test",
+    "pack:update": "changeset",
+    "pack:version": "changeset version",
+    "pack:publish": "pnpm build && changeset publish",
     "lint:fix": "pnpm --filter \"./apps/**\" --filter \"./packages/**\" --parallel --stream lint:fix",
-    "lint": "pnpm filename && pnpm --filter \"./apps/**\" --filter \"./packages/**\" --parallel --stream lint",
+    "lint": "pnpm --filter \"./apps/**\" --filter \"./packages/**\" --parallel --stream lint",
+    "format": "pnpm --filter \"./apps/**\" --filter \"./packages/**\" --parallel --stream format",
+    "format:check": "pnpm --filter \"./apps/**\" --filter \"./packages/**\" --parallel --stream format:check",
     "clear": "rm -rf node_modules pnpm-lock.yaml package-lock.json **/**/.nuxt **/**/node_modules **/**/pnpm-lock.yaml **/**/package-lock.json **/**/dist **/**/.DS_Store"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.6",
+    "eslint": "^9.39.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3"
   },
   "author": "",
   "license": "ISC",
