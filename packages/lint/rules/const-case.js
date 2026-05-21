@@ -9,15 +9,10 @@ const isCalleeRequire = (init) => {
 const isInitTypeLiteral = (init) => init && init.type === 'Literal'
 
 const isInitTypeNegativeLiteral = (init) =>
-  init &&
-  init.type === 'UnaryExpression' &&
-  init.operator === '-' &&
-  init.argument.type === 'Literal'
+  init && init.type === 'UnaryExpression' && init.operator === '-' && init.argument.type === 'Literal'
 
 const isLiteral = (init) =>
-  isInitTypeLiteral(init) ||
-  isInitTypeNegativeLiteral(init) ||
-  isInitTypeBinaryExpression(init)
+  isInitTypeLiteral(init) || isInitTypeNegativeLiteral(init) || isInitTypeBinaryExpression(init)
 
 function isInitTypeBinaryExpression(init) {
   return (
@@ -40,28 +35,19 @@ const rule = {
       if (node.kind === 'const') {
         node.declarations.forEach(({ id: { name }, init }) => {
           if (!isUpperCase(name) && isLiteral(init)) {
-            report({ node, message: messages.upper })
+            report({ message: messages.upper, node })
           }
 
-          if (
-            isUpperCase(name) &&
-            !isLiteral(init) &&
-            !isCalleeRequire(init) &&
-            !isSpecialChars(name)
-          ) {
-            report({ node, message: messages.lower })
+          if (isUpperCase(name) && !isLiteral(init) && !isCalleeRequire(init) && !isSpecialChars(name)) {
+            report({ message: messages.lower, node })
           }
         })
       }
 
       if (node.kind === 'let') {
         node.declarations.forEach(({ id: { name }, init }) => {
-          if (
-            isUpperCase(name) &&
-            !isCalleeRequire(init) &&
-            !isSpecialChars(name)
-          ) {
-            report({ node, message: messages.lower })
+          if (isUpperCase(name) && !isCalleeRequire(init) && !isSpecialChars(name)) {
+            report({ message: messages.lower, node })
           }
         })
       }

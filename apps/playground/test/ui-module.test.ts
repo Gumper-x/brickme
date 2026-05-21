@@ -1,11 +1,11 @@
+import { $fetch, setup } from '@nuxt/test-utils/e2e'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { $fetch, setup } from '@nuxt/test-utils/e2e'
 
 await setup({
-  rootDir: fileURLToPath(new URL('..', import.meta.url)),
   browser: false,
   port: 4173,
+  rootDir: fileURLToPath(new URL('..', import.meta.url)),
 })
 
 describe('playground ui module', () => {

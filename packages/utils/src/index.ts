@@ -1,6 +1,6 @@
-export const createBrickGreeting = (name: string) => `Hello from ${name}`
+export const createBrickGreeting = (name: string): string => `Hello from ${name}`
 
-export const toBrickClassName = (value: string) =>
+export const toBrickClassName = (value: string): string =>
   value
     .trim()
     .toLowerCase()

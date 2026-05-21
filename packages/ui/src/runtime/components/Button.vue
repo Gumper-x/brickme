@@ -1,27 +1,25 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+  import { computed } from 'vue'
 
-interface Props {
-  variant?: 'primary' | 'secondary'
-  size?: 'sm' | 'md'
-  type?: 'button' | 'submit' | 'reset'
-}
+  interface Props {
+    size?: 'md' | 'sm'
+    type?: 'button' | 'reset' | 'submit'
+    variant?: 'primary' | 'secondary'
+  }
 
-const props = withDefaults(defineProps<Props>(), {
-  variant: 'primary',
-  size: 'md',
-  type: 'button',
-})
+  const props = withDefaults(defineProps<Props>(), {
+    size: 'md',
+    type: 'button',
+    variant: 'primary',
+  })
 
-const sizeClass = computed(() =>
-  props.size === 'sm' ? 'min-h-10 px-4 text-sm' : 'min-h-12 px-5 text-sm/6',
-)
+  const sizeClass = computed(() => (props.size === 'sm' ? 'min-h-10 px-4 text-sm' : 'min-h-12 px-5 text-sm/6'))
 
-const variantClass = computed(() =>
-  props.variant === 'secondary'
-    ? 'border border-brick-200/80 bg-white/70 text-ink-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] hover:border-brick-400/50 hover:bg-brick-50'
-    : 'border border-brick-500/80 bg-linear-to-r from-brick-500 to-brick-600 text-white shadow-brick hover:from-brick-400 hover:to-brick-500',
-)
+  const variantClass = computed(() =>
+    props.variant === 'secondary'
+      ? 'border border-brick-200/80 bg-white/70 text-ink-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] hover:border-brick-400/50 hover:bg-brick-50'
+      : 'border border-brick-500/80 bg-linear-to-r from-brick-500 to-brick-600 text-white shadow-brick hover:from-brick-400 hover:to-brick-500',
+  )
 </script>
 
 <template>

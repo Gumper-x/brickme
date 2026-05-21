@@ -16,7 +16,7 @@
   "scripts": {
     "build": "nuxt-module-build",
     "typecheck": "vue-tsc --project tsconfig.json --noEmit",
-    "lint": "pnpm exec eslint .",
+    "lint": "pnpm typecheck && eslint -v && NODE_ENV=deploy eslint --cache .",
     "lint:fix": "pnpm exec eslint . --fix",
     "format": "pnpm exec prettier . --ignore-path ../../.prettierignore --write",
     "format:check": "pnpm exec prettier . --ignore-path ../../.prettierignore --check"

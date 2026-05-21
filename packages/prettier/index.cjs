@@ -19,4 +19,4 @@ const config = {
   vueIndentScriptAndStyle: true,
 }
 
-export default config
+module.exports = config

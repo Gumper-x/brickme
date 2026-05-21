@@ -1,11 +1,11 @@
 export default defineNuxtConfig({
-  modules: ['../../packages/ui/src/module.ts'],
+  brickflowUi: {
+    componentPrefix: 'Brick',
+    target: 'playground',
+  },
+  compatibilityDate: '2026-05-13',
   devtools: {
     enabled: true,
   },
-  compatibilityDate: '2026-05-13',
-  brickflowUi: {
-    target: 'playground',
-    componentPrefix: 'Brick',
-  },
+  modules: ['../../packages/ui/src/module.ts'],
 })

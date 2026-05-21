@@ -36,10 +36,7 @@ const baseRules = {
   ],
   '@typescript-eslint/explicit-module-boundary-types': 'error',
   '@typescript-eslint/no-dynamic-delete': 'off',
-  '@typescript-eslint/no-empty-object-type': [
-    'error',
-    { allowInterfaces: 'always' },
-  ],
+  '@typescript-eslint/no-empty-object-type': ['error', { allowInterfaces: 'always' }],
   '@typescript-eslint/no-invalid-void-type': 'off',
   '@typescript-eslint/no-require-imports': 'off',
   '@typescript-eslint/no-restricted-types': [
@@ -47,17 +44,13 @@ const baseRules = {
     {
       types: {
         object: {
-          message:
-            'Use Record<string, unknown> instead of object for better type safety.',
+          message: 'Use Record<string, unknown> instead of object for better type safety.',
         },
       },
     },
   ],
   '@typescript-eslint/no-shadow': 'error',
-  '@typescript-eslint/no-unused-expressions': [
-    'error',
-    { allowShortCircuit: true, allowTernary: true },
-  ],
+  '@typescript-eslint/no-unused-expressions': ['error', { allowShortCircuit: true, allowTernary: true }],
   '@typescript-eslint/no-unused-vars': [
     warn,
     {
@@ -278,13 +271,12 @@ const vueRules = {
 
 const jsRules = {
   '@typescript-eslint/explicit-function-return-type': 'off',
+  '@typescript-eslint/explicit-module-boundary-types': 'off',
   '@typescript-eslint/no-var-requires': 'off',
 }
 
 export function createLintConfig({ includeVue = false } = {}) {
-  const languageGlobals = includeVue
-    ? { ...globals.browser, ...globals.node }
-    : { ...globals.node }
+  const languageGlobals = includeVue ? { ...globals.browser, ...globals.node } : { ...globals.node }
 
   return [
     js.configs.recommended,
@@ -304,9 +296,9 @@ export function createLintConfig({ includeVue = false } = {}) {
       files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
       languageOptions: {
         ecmaVersion: 'latest',
-        sourceType: 'module',
         globals: languageGlobals,
         parser: tseslint.parser,
+        sourceType: 'module',
       },
       rules: baseRules,
     },
@@ -316,12 +308,12 @@ export function createLintConfig({ includeVue = false } = {}) {
             files: ['**/*.vue'],
             languageOptions: {
               ecmaVersion: 'latest',
-              sourceType: 'module',
               globals: languageGlobals,
               parser: vueParser,
               parserOptions: {
                 parser: tseslint.parser,
               },
+              sourceType: 'module',
             },
             rules: {
               ...baseRules,

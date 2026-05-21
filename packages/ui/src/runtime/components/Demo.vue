@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { usebrickflow } from '../composables/usebrickflow'
+  import { usebrickflow } from '../composables/useBrickme'
   import Button from './Button.vue'
 
   const brickflow = usebrickflow()

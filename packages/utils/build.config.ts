@@ -5,17 +5,17 @@ export default defineConfig({
   input: './src/index.ts',
   output: {
     dir: 'dist',
-    format: 'es',
     entryFileNames: '[name].mjs',
+    format: 'es',
     sourcemap: true,
   },
   plugins: [
     dts({
-      sourcemap: true,
-      tsconfig: './tsconfig.json',
       compilerOptions: {
         noEmit: false,
       },
+      sourcemap: true,
+      tsconfig: './tsconfig.json',
     }),
   ],
 })

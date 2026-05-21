@@ -5,11 +5,18 @@
   "type": "module",
   "description": "Shared Prettier config for brickflow workspaces.",
   "files": [
-    "index.js"
+    "index.js",
+    "index.cjs"
   ],
-  "exports": "./index.js",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.cjs",
+      "default": "./index.js"
+    }
+  },
   "scripts": {
-    "lint": "pnpm exec eslint .",
+    "lint": "pnpm run --if-present typecheck && eslint -v && NODE_ENV=deploy eslint --cache .",
     "lint:fix": "pnpm exec eslint . --fix",
     "format": "pnpm exec prettier . --ignore-path ../../.prettierignore --write",
     "format:check": "pnpm exec prettier . --ignore-path ../../.prettierignore --check"

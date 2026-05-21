@@ -4,10 +4,11 @@
   "type": "module",
   "scripts": {
     "dev": "NODE_OPTIONS='--conditions=development' nuxt dev",
-    "build": "nuxt build",
-    "typecheck": "nuxt typecheck",
-    "test": "nuxt prepare && vitest run",
-    "lint": "pnpm exec eslint .",
+    "postinstall": "NODE_OPTIONS='--conditions=development' nuxt prepare",
+    "build": "NODE_OPTIONS='--conditions=development' nuxt build",
+    "typecheck": "NODE_OPTIONS='--conditions=development' nuxt typecheck",
+    "test": "NODE_OPTIONS='--conditions=development' nuxt prepare && vitest run",
+    "lint": "pnpm typecheck && eslint -v && NODE_ENV=deploy eslint --cache .",
     "lint:fix": "pnpm exec eslint . --fix",
     "format": "pnpm exec prettier . --ignore-path ../../.prettierignore --write",
     "format:check": "pnpm exec prettier . --ignore-path ../../.prettierignore --check"
