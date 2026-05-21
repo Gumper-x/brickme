@@ -10,7 +10,7 @@
     "build": "pnpm --recursive --filter \"./packages/**\" --if-present build",
     "typecheck": "pnpm --recursive --filter \"./packages/**\" --filter \"./apps/**\" typecheck",
     "test": "pnpm --filter playground test",
-    "pack:update": "changeset",
+    "pack:update": "changeset && changeset version",
     "pack:version": "changeset version",
     "pack:publish": "pnpm build && node ./scripts/publish-packages.mjs",
     "pack:publish:dry": "pnpm build && node ./scripts/publish-packages.mjs --dry-run",
