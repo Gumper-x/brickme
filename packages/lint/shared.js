@@ -177,6 +177,7 @@ const baseRules = {
 }
 
 const vueRules = {
+  'no-useless-assignment': 'off',
   'vue/attribute-hyphenation': [
     'error',
     'never',

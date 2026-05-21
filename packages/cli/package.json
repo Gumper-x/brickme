@@ -1,9 +1,14 @@
 {
   "name": "@brickflow/cli",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
-  "main": "index.js",
+  "type": "module",
+  "main": "index.mjs",
+  "bin": {
+    "brick": "./index.mjs"
+  },
   "scripts": {
+    "latest": "node ./index.mjs latest",
     "lint": "pnpm run --if-present typecheck && eslint -v && NODE_ENV=deploy eslint --cache .",
     "lint:fix": "pnpm exec eslint . --fix",
     "format": "pnpm exec prettier . --ignore-path ../../.prettierignore --write",

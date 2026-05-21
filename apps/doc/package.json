@@ -12,9 +12,9 @@
     "format:check": "pnpm exec prettier . --ignore-path ../../.prettierignore --check"
   },
   "dependencies": {
-    "docus": "latest",
-    "better-sqlite3": "^12.6.2",
-    "nuxt": "^4.3.1"
+    "docus": "5.11.0",
+    "better-sqlite3": "12.10.0",
+    "nuxt": "4.4.6"
   },
   "devDependencies": {
     "@brickflow/lint": "workspace:*",

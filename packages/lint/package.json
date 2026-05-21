@@ -1,6 +1,6 @@
 {
   "name": "@brickflow/lint",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "description": "Shared ESLint configs for brickflow workspaces.",
   "files": [
@@ -34,16 +34,16 @@
     "access": "public"
   },
   "dependencies": {
-    "@eslint/js": "^9.39.0",
+    "@eslint/js": "10.0.1",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-perfectionist": "4.15.0",
-    "eslint-plugin-prettier": "5.5.4",
-    "eslint-plugin-promise": "7.2.1",
-    "eslint-plugin-regexp": "2.10.0",
-    "eslint-plugin-vue": "10.5.0",
-    "globals": "^16.4.0",
-    "typescript-eslint": "8.44.1",
-    "vue-eslint-parser": "10.2.0"
+    "eslint-plugin-perfectionist": "5.9.0",
+    "eslint-plugin-prettier": "5.5.5",
+    "eslint-plugin-promise": "7.3.0",
+    "eslint-plugin-regexp": "3.1.0",
+    "eslint-plugin-vue": "10.9.1",
+    "globals": "17.6.0",
+    "typescript-eslint": "8.59.4",
+    "vue-eslint-parser": "10.4.0"
   },
   "peerDependencies": {
     "eslint": ">=9",

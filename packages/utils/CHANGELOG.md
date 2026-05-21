@@ -1,5 +1,11 @@
 # @brickflow/utils
 
+## 0.0.5
+
+### Patch Changes
+
+- Bump vesrions
+
 ## 0.0.4
 
 ### Patch Changes
