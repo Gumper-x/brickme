@@ -143,6 +143,7 @@ const baseRules = {
   'no-unreachable-loop': 'error',
   'no-unused-private-class-members': 'error',
   'no-unused-vars': 'off',
+  'no-useless-assignment': 'off',
   'no-useless-call': 'error',
   'no-useless-computed-key': 'error',
   'no-useless-concat': 'error',
@@ -177,7 +178,6 @@ const baseRules = {
 }
 
 const vueRules = {
-  'no-useless-assignment': 'off',
   'vue/attribute-hyphenation': [
     'error',
     'never',
