@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const brickflow = usebrickflow()
+  const brickflow = usebrickflow()
 </script>
 
 <template>
@@ -9,14 +9,8 @@ const brickflow = usebrickflow()
     <section class="mx-auto grid max-w-4xl gap-8 lg:grid-cols-[1.2fr_0.8fr]">
       <div class="grid gap-6">
         <div class="grid gap-3">
-          <span
-            class="text-xs font-semibold uppercase tracking-[0.3em] text-brick-600"
-          >
-            brickflow UI
-          </span>
-          <h1
-            class="max-w-2xl text-5xl font-semibold tracking-[-0.04em] text-ink-950"
-          >
+          <span class="text-xs font-semibold uppercase tracking-[0.3em] text-brick-600">brickflow UI</span>
+          <h1 class="max-w-2xl text-5xl font-semibold tracking-[-0.04em] text-ink-950">
             Tailwind v4 is now wired into the UI package.
           </h1>
           <p

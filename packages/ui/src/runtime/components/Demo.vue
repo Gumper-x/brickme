@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import Button from './Button.vue'
-import { usebrickflow } from '../composables/usebrickflow'
+  import { usebrickflow } from '../composables/usebrickflow'
+  import Button from './Button.vue'
 
-const brickflow = usebrickflow()
+  const brickflow = usebrickflow()
 </script>
 
 <template>

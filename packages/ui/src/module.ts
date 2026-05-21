@@ -1,28 +1,23 @@
-import {
-  addComponentsDir,
-  addImportsDir,
-  createResolver,
-  defineNuxtModule,
-} from '@nuxt/kit'
-import tailwindcss from '@tailwindcss/vite'
 import { createBrickGreeting } from '@brickflow/utils'
+import { addComponentsDir, addImportsDir, createResolver, defineNuxtModule } from '@nuxt/kit'
+import tailwindcss from '@tailwindcss/vite'
 
 export interface ModuleOptions {
-  target?: string
   componentPrefix?: string
+  target?: string
 }
 
 export default defineNuxtModule<ModuleOptions>({
+  defaults: {
+    componentPrefix: 'Brick',
+    target: 'world',
+  },
   meta: {
-    name: '@brickflow/ui',
-    configKey: 'brickflowUi',
     compatibility: {
       nuxt: '>=4.0.0',
     },
-  },
-  defaults: {
-    target: 'world',
-    componentPrefix: 'Brick',
+    configKey: 'brickflowUi',
+    name: '@brickflow/ui',
   },
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
@@ -30,8 +25,8 @@ export default defineNuxtModule<ModuleOptions>({
 
     nuxt.options.runtimeConfig.public.brickflowUi = {
       ...currentConfig,
-      target: options.target ?? 'world',
       message: createBrickGreeting(options.target ?? 'world'),
+      target: options.target ?? 'world',
     }
 
     nuxt.options.css.push(resolver.resolve('./runtime/assets/css/main.css'))
@@ -45,8 +40,8 @@ export default defineNuxtModule<ModuleOptions>({
     addImportsDir(resolver.resolve('./runtime/composables'))
     addComponentsDir({
       path: resolver.resolve('./runtime/components'),
-      prefix: options.componentPrefix ?? 'Brick',
       pathPrefix: false,
+      prefix: options.componentPrefix ?? 'Brick',
     })
   },
 })
