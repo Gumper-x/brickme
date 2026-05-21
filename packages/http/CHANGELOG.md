@@ -1,5 +1,11 @@
 # @brickflow/http
 
+## 0.0.4
+
+### Patch Changes
+
+- Lint support commonJS
+
 ## 0.0.3
 
 ### Patch Changes

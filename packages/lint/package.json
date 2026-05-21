@@ -1,19 +1,29 @@
 {
   "name": "@brickflow/lint",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": true,
   "type": "module",
   "description": "Shared ESLint configs for brickflow workspaces.",
   "files": [
+    "index.cjs",
     "index.js",
+    "nuxt.cjs",
     "nuxt.js",
     "shared.js",
     "brick.js",
     "rules"
   ],
   "exports": {
-    ".": "./index.js",
-    "./nuxt": "./nuxt.js"
+    ".": {
+      "import": "./index.js",
+      "require": "./index.cjs",
+      "default": "./index.js"
+    },
+    "./nuxt": {
+      "import": "./nuxt.js",
+      "require": "./nuxt.cjs",
+      "default": "./nuxt.js"
+    }
   },
   "scripts": {
     "lint": "pnpm run --if-present typecheck && eslint -v && NODE_ENV=deploy eslint --cache .",
