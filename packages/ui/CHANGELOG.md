@@ -1,5 +1,13 @@
 # @brickflow/ui
 
+## 0.0.3
+
+### Patch Changes
+
+- 75f0614: Config for all
+- Updated dependencies [75f0614]
+  - @brickflow/utils@0.0.3
+
 ## 0.0.2
 
 ### Patch Changes

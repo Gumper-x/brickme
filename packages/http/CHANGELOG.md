@@ -1,5 +1,11 @@
 # @brickflow/http
 
+## 0.0.3
+
+### Patch Changes
+
+- 75f0614: Config for all
+
 ## 0.0.2
 
 ### Patch Changes
