@@ -1,7 +1,6 @@
 {
   "name": "@brickflow/prettier",
   "version": "0.0.4",
-  "private": true,
   "type": "module",
   "description": "Shared Prettier config for brickflow workspaces.",
   "files": [
@@ -20,6 +19,9 @@
     "lint:fix": "pnpm exec eslint . --fix",
     "format": "pnpm exec prettier . --ignore-path ../../.prettierignore --write",
     "format:check": "pnpm exec prettier . --ignore-path ../../.prettierignore --check"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "peerDependencies": {
     "prettier": ">=3"
