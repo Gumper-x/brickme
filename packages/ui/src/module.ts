@@ -1,4 +1,3 @@
-import { createBrickGreeting } from '@brickflow/utils'
 import { addComponentsDir, addImportsDir, createResolver, defineNuxtModule } from '@nuxt/kit'
 import tailwindcss from '@tailwindcss/vite'
 
@@ -25,7 +24,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     nuxt.options.runtimeConfig.public.brickflowUi = {
       ...currentConfig,
-      message: createBrickGreeting(options.target ?? 'world'),
+      message: 'world',
       target: options.target ?? 'world',
     }
 

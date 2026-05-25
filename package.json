@@ -7,6 +7,7 @@
     "dev:doc": "pnpm --filter doc dev --host",
     "dev:playground": "pnpm --filter playground dev --host",
     "dev:ui": "pnpm dev:playground",
+    "docs:utils": "node ./scripts/generate-utils-docs.mjs",
     "build": "pnpm --recursive --filter \"./packages/**\" --if-present build",
     "typecheck": "pnpm --recursive --filter \"./packages/**\" --filter \"./apps/**\" typecheck",
     "test": "pnpm --filter playground test",
