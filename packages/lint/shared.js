@@ -170,7 +170,7 @@ const baseRules = {
   'promise/no-new-statics': 'error',
   'promise/no-return-in-finally': 'error',
   'promise/no-return-wrap': 'error',
-  'promise/param-names': 'error',
+  'promise/param-names': 'off',
   'promise/prefer-await-to-then': warn,
   'promise/valid-params': 'error',
   'require-await': warn,

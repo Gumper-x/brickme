@@ -1,6 +1,10 @@
 export function isArrayString(value: unknown[]): value is string[] {
   return typeof value[0] === 'string'
 }
+export function isBoolean(value: unknown): value is boolean {
+  return typeof value === 'boolean'
+}
+
 /**
  * @returns isEmpty('') => true
  * @returns isEmpty([]) => true
@@ -40,6 +44,42 @@ export function isEmpty<T>(value: T): value is Extract<T, [] | null | undefined>
   return Object.keys(value).length === 0
 }
 
+export function isEqual(left: unknown, right: unknown): boolean {
+  if (left === right) {
+    return true
+  }
+
+  if (left === null || right === null || typeof left !== 'object' || typeof right !== 'object') {
+    return false
+  }
+
+  if (Object.prototype.toString.call(left) !== Object.prototype.toString.call(right)) {
+    return false
+  }
+
+  const leftKeys = Object.keys(left)
+  const rightKeys = Object.keys(right)
+
+  if (leftKeys.length !== rightKeys.length) {
+    return false
+  }
+
+  return leftKeys.every(
+    (key) =>
+      rightKeys.includes(key) &&
+      isEqual((left as Record<string, unknown>)[key], (right as Record<string, unknown>)[key]),
+  )
+}
+
+export function isEqualArrayUnordered<T>(left: T[] = [], right: T[] = []): boolean {
+  if (left.length !== right.length) {
+    return false
+  }
+
+  const leftSet = new Set(left)
+  return right.every((item) => leftSet.has(item))
+}
+
 export function isFloat(value: number): boolean {
   return Number(value) === value && value % 1 !== 0
 }
@@ -70,6 +110,11 @@ export function isValidDate(date: Date | number | string): boolean {
 
   return typeof date === 'number' || date instanceof Date
 }
+
+export function isValidUrl(value: string): boolean {
+  return /^https:\/\/[^\s/$.?#].\S*$/i.test(value)
+}
+
 function isDate(value: unknown): value is Date {
   if (Object.prototype.toString.call(value) === '[object Date]') {
     return true
@@ -174,4 +219,8 @@ export function isTelegram(): boolean {
 
 export function isTouchDevice(): boolean {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.maxTouchPoints > 0
+}
+
+export function isTouchEvent(value: Event): value is TouchEvent {
+  return 'touches' in value
 }
