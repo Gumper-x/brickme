@@ -1,109 +1,60 @@
 #!/usr/bin/env node
 
-import { execFile } from 'node:child_process'
-import { readdir, readFile, writeFile } from 'node:fs/promises'
+import { access, readdir } from 'node:fs/promises'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { promisify } from 'node:util'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
-const execFileAsync = promisify(execFile)
 const cliDir = path.dirname(fileURLToPath(import.meta.url))
-const repoRoot = path.resolve(cliDir, '../..')
-const workspaceRoots = ['apps', 'packages']
+const commandsDir = path.join(cliDir, 'src')
 
-async function getWorkspacePackageJsonPaths() {
-  const packagePaths = []
+async function getAvailableCommands() {
+  const entries = await readdir(commandsDir, { withFileTypes: true })
 
-  for (const workspaceRoot of workspaceRoots) {
-    const rootPath = path.join(repoRoot, workspaceRoot)
-    const entries = await readdir(rootPath, { withFileTypes: true })
+  return entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort()
+}
 
-    for (const entry of entries) {
-      if (!entry.isDirectory()) {
-        continue
-      }
-
-      packagePaths.push(path.join(rootPath, entry.name, 'package.json'))
-    }
-  }
-
-  return packagePaths
+function isValidCommandName(command) {
+  return typeof command === 'string' && /^[a-z0-9-]+$/i.test(command)
 }
 
 async function main() {
   const [command] = process.argv.slice(2)
+  const commands = await getAvailableCommands()
 
-  switch (command) {
-    case 'latest':
-      await runLatest()
-      return
-    default:
-      printHelp()
-      process.exitCode = 1
+  if (!command || !(await runCommand(command))) {
+    printHelp(commands)
+    process.exitCode = 1
   }
 }
 
-function printHelp() {
+function printHelp(commands) {
   console.log(`brick cli
 
 Usage:
-  brick latest`)
+  brick <command>
+
+Commands:
+  ${commands.join('\n  ')}`)
 }
 
-function renderProgress(percent) {
-  const completed = Math.round(percent / 10)
-  return `${'#'.repeat(completed)}${'.'.repeat(10 - completed)}`
-}
-
-async function runLatest() {
-  console.log('\x1b[32mPackage update')
-
-  const packagePaths = await getWorkspacePackageJsonPaths()
-  let index = 0
-
-  for (const packagePath of packagePaths) {
-    index += 1
-
-    const packageJson = JSON.parse(await readFile(packagePath, 'utf8'))
-    await updatePackageVersions(packageJson)
-    await writeFile(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`)
-
-    const percent = Math.round((index * 100) / packagePaths.length)
-    process.stdout.write(`\rUpdating: [${renderProgress(percent)}] ${percent}%`)
+async function runCommand(command) {
+  if (!isValidCommandName(command)) {
+    return false
   }
 
-  process.stdout.write('\n')
-  console.log('\x1b[0m')
-}
+  const commandEntry = path.join(commandsDir, command, 'index.js')
 
-async function updatePackageVersions(packageJson) {
-  const dependencyEntries = [
-    ...Object.entries(packageJson.dependencies || {}).map(([name, version]) => ({
-      group: 'dependencies',
-      name,
-      version,
-    })),
-    ...Object.entries(packageJson.devDependencies || {}).map(([name, version]) => ({
-      group: 'devDependencies',
-      name,
-      version,
-    })),
-  ]
+  try {
+    await access(commandEntry)
+  } catch {
+    return false
+  }
 
-  await Promise.all(
-    dependencyEntries.map(async ({ group, name, version }) => {
-      if (version === 'workspace:*' || version === 'workspace: *') {
-        return
-      }
-
-      try {
-        const { stdout } = await execFileAsync('npm', ['view', name, 'version'])
-        packageJson[group][name] = stdout.trim()
-      } catch (error) {
-        console.info(error instanceof Error ? error.message : String(error))
-      }
-    }),
-  )
+  await import(pathToFileURL(commandEntry).href)
+  return true
 }
 
 await main()

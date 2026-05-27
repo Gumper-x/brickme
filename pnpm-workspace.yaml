@@ -2,10 +2,14 @@ packages:
   - 'packages/*'
   - 'apps/*'
 allowBuilds:
+  '@google/genai': false
   '@parcel/watcher': true
   better-sqlite3: true
+  es5-ext: false
   esbuild: true
+  protobufjs: false
   sharp: true
+  ttf2woff2: true
   vue-demi: true
 shamefullyHoist: true
 sharedWorkspaceLockfile: true
