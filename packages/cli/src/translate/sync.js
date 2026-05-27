@@ -11,6 +11,7 @@ import {
   getTranslationPaths,
   listWorkspaceFiles,
   sortObjectKeys,
+  stringifySortedJson,
 } from './utils.js'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
@@ -50,7 +51,7 @@ function createProgress(total) {
   const start = Date.now()
 
   return function update(currentFile) {
-    done++
+    done += 1
 
     const percent = Math.round((done * 100) / total)
     const filled = Math.round(percent / 5)
@@ -78,6 +79,52 @@ function detectEol(filePath) {
 
   const text = readFileSync(filePath, 'utf-8')
   return text.includes('\r\n') ? '\r\n' : '\n'
+}
+
+// ---------- core ----------
+
+function ensureSortedJsonFile(filePath) {
+  if (!existsSync(filePath)) {
+    return false
+  }
+
+  const currentText = readFileSync(filePath, 'utf-8')
+  const parsed = JSON.parse(currentText)
+  const sortedText = stringifySortedJson(parsed)
+
+  if (normalizeJsonEol(currentText) === normalizeJsonEol(sortedText)) {
+    return false
+  }
+
+  writeTextPreservingEol(filePath, sortedText)
+  return true
+}
+
+function ensureSortedTranslationJsons(baseDir, samplePath) {
+  const filesToCheck = [samplePath, resolve(baseDir, 'ai-context.json')]
+  const generatedDir = resolve(baseDir, 'generated')
+
+  if (existsSync(generatedDir)) {
+    for (const entry of readdirSync(generatedDir, { withFileTypes: true })) {
+      if (entry.isFile() && entry.name.endsWith('.json')) {
+        filesToCheck.push(resolve(generatedDir, entry.name))
+      }
+    }
+  }
+
+  for (const filePath of filesToCheck) {
+    try {
+      if (ensureSortedJsonFile(filePath)) {
+        console.log('\n🔤 Sorted keys:', filePath)
+      }
+    } catch (error) {
+      console.error('\n❌ invalid translation json:', filePath, error)
+    }
+  }
+}
+
+function normalizeJsonEol(content) {
+  return String(content).replace(/\r\n/g, '\n')
 }
 
 // ---------- core ----------
@@ -143,7 +190,9 @@ function writeTranslations(id, strings) {
   if (existsSync(samplePath)) {
     try {
       prev = JSON.parse(readFileSync(samplePath, 'utf-8'))
-    } catch {}
+    } catch {
+      prev = {}
+    }
   }
 
   const next = {}
@@ -158,9 +207,11 @@ function writeTranslations(id, strings) {
     Object.keys(prev).every((k) => prev[k] === sortedNext[k])
 
   if (!isSame) {
-    writeTextPreservingEol(samplePath, JSON.stringify(sortedNext, null, 2))
+    writeTextPreservingEol(samplePath, stringifySortedJson(sortedNext))
     console.log('\n🧪 Updated:', samplePath)
   }
+
+  ensureSortedTranslationJsons(baseDir, samplePath)
 }
 
 // ---------- run ----------

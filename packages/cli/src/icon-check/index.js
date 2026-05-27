@@ -5,7 +5,6 @@ import looksSame from 'looks-same'
 import path from 'path'
 import sharp from 'sharp'
 import { optimize } from 'svgo'
-import { fileURLToPath } from 'url'
 
 const args = process.argv.slice(3)
 
@@ -355,7 +354,7 @@ async function createIconArtifacts(normalizedSvg, svgPath) {
       strictHash,
     }
   } catch (error) {
-    throw new Error(`Failed to process SVG: ${svgPath}\n${error.message}`)
+    throw new Error(`Failed to process SVG: ${svgPath}\n${error.message}`, { cause: error })
   }
 }
 
@@ -584,55 +583,6 @@ function formatDuration(milliseconds) {
   return `${(milliseconds / 1000).toFixed(2)}s`
 }
 
-function parseArgs(rawArgs) {
-  const options = {
-    name: null,
-    path: null,
-  }
-  const positional = []
-
-  for (let index = 0; index < rawArgs.length; index += 1) {
-    const value = rawArgs[index]
-
-    if (value === '--path') {
-      options.path = rawArgs[index + 1] ?? null
-      index += 1
-      continue
-    }
-
-    if (value === '--name') {
-      options.name = rawArgs[index + 1] ?? null
-      index += 1
-      continue
-    }
-
-    positional.push(value)
-  }
-
-  if (!options.path) {
-    options.path = positional[0] ?? null
-  }
-
-  if (!options.name) {
-    options.name = positional[1] ?? null
-  }
-
-  return options
-}
-
-function printHelp() {
-  console.log(`brick icon-check <path> [name]
-
-Usage:
-  brick icon-check ./path/to/svg-icons
-  brick icon-check ./path/to/svg-icons bounty
-  brick icon-check --path ./path/to/svg-icons --name bounty
-
-Notes:
-  path: directory with source .svg icons
-  name: label for logs and allowed duplicate pairs; default is the directory name`)
-}
-
 function isAllowedDuplicateIconPair(scope, firstIconName, secondIconName) {
   return allowedDuplicateIconPairs.has(duplicateIconPairKey(scope, firstIconName, secondIconName))
 }
@@ -649,6 +599,55 @@ function normalizeSvg(svg, svgPath) {
 
 function pairKeyFromIndexes(firstIndex, secondIndex) {
   return firstIndex < secondIndex ? `${firstIndex}:${secondIndex}` : `${secondIndex}:${firstIndex}`
+}
+
+function parseArgs(rawArgs) {
+  const parsedOptions = {
+    name: null,
+    path: null,
+  }
+  const positional = []
+
+  for (let index = 0; index < rawArgs.length; index += 1) {
+    const value = rawArgs[index]
+
+    if (value === '--path') {
+      parsedOptions.path = rawArgs[index + 1] ?? null
+      index += 1
+      continue
+    }
+
+    if (value === '--name') {
+      parsedOptions.name = rawArgs[index + 1] ?? null
+      index += 1
+      continue
+    }
+
+    positional.push(value)
+  }
+
+  if (!parsedOptions.path) {
+    parsedOptions.path = positional[0] ?? null
+  }
+
+  if (!parsedOptions.name) {
+    parsedOptions.name = positional[1] ?? null
+  }
+
+  return parsedOptions
+}
+
+function printHelp() {
+  console.log(`brick icon-check <path> [name]
+
+Usage:
+  brick icon-check ./path/to/svg-icons
+  brick icon-check ./path/to/svg-icons bounty
+  brick icon-check --path ./path/to/svg-icons --name bounty
+
+  Notes:
+  path: directory with source .svg icons
+  name: label for logs and allowed duplicate pairs; default is the directory name`)
 }
 
 function renderForDHash(svgContent) {
@@ -834,7 +833,10 @@ console.log(`Start icon-check for "${scopeName}"`)
 console.log(`[${scopeName}] ${svgFiles.length} icons`)
 
 const totalPairsEstimate = (svgFiles.length * (svgFiles.length - 1)) / 2
-const progress = createProgressTracker(`${scopeName} pipeline step 1/3 hash & render`, svgFiles.length + totalPairsEstimate + 1)
+const progress = createProgressTracker(
+  `${scopeName} pipeline step 1/3 hash & render`,
+  svgFiles.length + totalPairsEstimate + 1,
+)
 const entries = []
 
 for (const svgPath of svgFiles) {

@@ -54,7 +54,9 @@ await generateFonts({
   outputDir,
 })
 
-const cssSourceFile = [`${iconName}.css`, 'icons.css', 'icon.css'].find((file) => fs.existsSync(path.join(outputDir, file)))
+const cssSourceFile = [`${iconName}.css`, 'icons.css', 'icon.css'].find((file) =>
+  fs.existsSync(path.join(outputDir, file)),
+)
 
 if (!cssSourceFile) {
   throw new Error(`CSS output file was not generated for icon set "${iconName}"`)
@@ -98,7 +100,7 @@ function normalizeGeneratedCss(css) {
 }
 
 function parseArgs(rawArgs) {
-  const options = {
+  const parsedOptions = {
     name: null,
     output: null,
     path: null,
@@ -109,19 +111,19 @@ function parseArgs(rawArgs) {
     const value = rawArgs[index]
 
     if (value === '--path') {
-      options.path = rawArgs[index + 1] ?? null
+      parsedOptions.path = rawArgs[index + 1] ?? null
       index += 1
       continue
     }
 
     if (value === '--name') {
-      options.name = rawArgs[index + 1] ?? null
+      parsedOptions.name = rawArgs[index + 1] ?? null
       index += 1
       continue
     }
 
     if (value === '--output') {
-      options.output = rawArgs[index + 1] ?? null
+      parsedOptions.output = rawArgs[index + 1] ?? null
       index += 1
       continue
     }
@@ -129,19 +131,19 @@ function parseArgs(rawArgs) {
     positional.push(value)
   }
 
-  if (!options.path) {
-    options.path = positional[0] ?? null
+  if (!parsedOptions.path) {
+    parsedOptions.path = positional[0] ?? null
   }
 
-  if (!options.name) {
-    options.name = positional[1] ?? null
+  if (!parsedOptions.name) {
+    parsedOptions.name = positional[1] ?? null
   }
 
-  if (!options.output) {
-    options.output = positional[2] ?? null
+  if (!parsedOptions.output) {
+    parsedOptions.output = positional[2] ?? null
   }
 
-  return options
+  return parsedOptions
 }
 
 function printHelp() {

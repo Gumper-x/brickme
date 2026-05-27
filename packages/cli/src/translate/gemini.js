@@ -2,12 +2,12 @@ import { GoogleGenAI } from '@google/genai'
 
 import { getModelRpm } from './models.js'
 
-const apiKey = process.env.GEMINI_API_KEY || 'AIzaSyB2oEO4n6BtDAY157phoQesiWoBk7STGLk'
-// process.env.GEMINI_API_KEY || "AIzaSyAtTDRWoIcwL4KgF6sYdp2MHhqLZln-ax8";
-const client = new GoogleGenAI({ apiKey })
+const clientsByApiKey = new Map()
 const modelState = new Map()
 
-export async function generateContentWithLimits({ config, contents, maxRetries = 5, model }) {
+export async function generateContentWithLimits({ apiKey, config, contents, maxRetries = 5, model }) {
+  const client = getClient(apiKey)
+
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     await waitForModelSlot(model)
 
@@ -40,6 +40,22 @@ export async function generateContentWithLimits({ config, contents, maxRetries =
   }
 
   return ''
+}
+
+function getClient(apiKey) {
+  if (!apiKey) {
+    throw new Error('Gemini API key is required')
+  }
+
+  const cached = clientsByApiKey.get(apiKey)
+
+  if (cached) {
+    return cached
+  }
+
+  const client = new GoogleGenAI({ apiKey })
+  clientsByApiKey.set(apiKey, client)
+  return client
 }
 
 function getModelState(model) {

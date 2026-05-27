@@ -1,5 +1,18 @@
 import fs from 'fs'
 import { globSync } from 'glob'
+
+const args = process.argv.slice(3)
+
+if (args.includes('--help') || args.includes('-h')) {
+  printHelp()
+  process.exit(0)
+}
+
+if (args.length > 0) {
+  printHelp()
+  process.exit(1)
+}
+
 console.log('\x1b[32m', '\rAssets analyse')
 const imgList = globSync('./**/*.{webp,svg}')
 
@@ -37,3 +50,15 @@ if (result.length > 0) {
 }
 
 console.log('\x1b[0m', '')
+
+function printHelp() {
+  console.log(`brick size
+
+Usage:
+  brick size
+
+Notes:
+  Scans .webp and .svg files under the current working directory
+  Fails when a file is larger than 400000 bytes
+  Ignores files ending with -animation.webp`)
+}

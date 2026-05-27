@@ -1,6 +1,19 @@
 import fs from 'fs'
 import { globSync } from 'glob'
 import { optimize } from 'svgo'
+
+const args = process.argv.slice(3)
+
+if (args.includes('--help') || args.includes('-h')) {
+  printHelp()
+  process.exit(0)
+}
+
+if (args.length > 0) {
+  printHelp()
+  process.exit(1)
+}
+
 console.log('\x1b[32m', '\rSVG Optimize')
 const svgList = globSync('./**/*.svg')
 
@@ -71,3 +84,14 @@ for (let i = 0; i < svgList.length; i++) {
   process.stdout.write(`\r🔅 Optimizing: [${'🌹'.repeat((percent * 10) / 100)}]  ${percent}%`)
 }
 console.log('\x1b[0m', '')
+
+function printHelp() {
+  console.log(`brick svg
+
+Usage:
+  brick svg
+
+Notes:
+  Scans .svg files under the current working directory
+  Optimizes files in place with svgo`)
+}

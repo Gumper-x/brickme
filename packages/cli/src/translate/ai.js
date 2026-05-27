@@ -1,4 +1,6 @@
 import { generateContentWithLimits } from './gemini.js'
+import { getTranslateRuntimeConfig } from './runtime-config.js'
+
 const MODEL = process.env.TRANSLATE_AI_MODEL || 'gemini-3.1-flash-lite-preview'
 
 export async function translateBatch(strings, options) {
@@ -56,32 +58,19 @@ function buildContents(strings, sourceLocale, targetLocales, componentContext) {
 }
 
 function buildSystemInstruction() {
+  const { productContext, terminology, tone } = getTranslateRuntimeConfig()
+
   return [
     'You are a professional localization engine for a paid adult content platform.',
     '',
     'PRODUCT CONTEXT:',
-    '- This product allows creators to upload and sell content collections (bundles of media).',
-    '- A collection is a curated set of content (images, videos, or links).',
-    '- Some content is free, some is VIP (paid).',
-    '- Users can preview content before unlocking it.',
-    '- Unlock means paying to access premium content.',
-    '- VIP means paid access to content inside a collection.',
-    '- The tone should be natural, modern, slightly casual, and conversion-oriented.',
-    '- Do not censor or soften adult-related wording if present in the source.',
+    productContext,
     '',
     'TERMINOLOGY:',
-    '- Collection = curated content pack, not a generic folder.',
-    '- Asset = a content item such as an image, video, or link.',
-    '- Unlock = get paid access to content.',
-    '- VIP = paid content inside a collection.',
-    '- Creator = user who uploads and sells content.',
-    '- Preview = visible part before purchase.',
+    terminology,
     '',
     'TONE:',
-    '- Keep translations natural and native-sounding.',
-    '- Prefer product and marketing language over literal translation when meaning stays intact.',
-    '- Avoid robotic or overly formal phrasing.',
-    '- Keep emotional and persuasive tone when present.',
+    tone,
     '',
     'RULES:',
     '- Return only raw JSON.',
@@ -161,7 +150,10 @@ function normalizeTranslations(parsed, strings, targetLocales) {
 }
 
 async function requestTranslation(contents, systemInstruction) {
+  const { apiKey } = getTranslateRuntimeConfig()
+
   return await generateContentWithLimits({
+    apiKey,
     config: {
       systemInstruction,
     },

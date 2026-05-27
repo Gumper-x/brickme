@@ -22,11 +22,7 @@ const entries = readdirSync(inputDir)
   .filter((entry) => statSync(path.join(inputDir, entry)).isFile())
   .sort((first, second) => first.localeCompare(second))
 
-const typeValues = new Set(
-  entries
-    .map((entry) => applyReplace(entry, replacePattern))
-    .filter(Boolean),
-)
+const typeValues = new Set(entries.map((entry) => applyReplacePattern(entry, replacePattern)).filter(Boolean))
 
 if (typeValues.size === 0) {
   throw new Error(`No type values generated from: ${inputDir}`)
@@ -39,16 +35,16 @@ console.log(`✅ Types generated for ${options.typeName}`)
 console.log(`   input:  ${inputDir}`)
 console.log(`   output: ${outputFile}`)
 
-function applyReplace(value, replacePattern) {
-  if (replacePattern instanceof RegExp) {
-    return value.replace(replacePattern, '')
+function applyReplacePattern(value, pattern) {
+  if (pattern instanceof RegExp) {
+    return value.replace(pattern, '')
   }
 
-  return value.replaceAll(replacePattern, '')
+  return value.replaceAll(pattern, '')
 }
 
 function parseArgs(rawArgs) {
-  const options = {
+  const parsedOptions = {
     outputFile: null,
     path: null,
     replacePattern: null,
@@ -60,25 +56,25 @@ function parseArgs(rawArgs) {
     const value = rawArgs[index]
 
     if (value === '--path') {
-      options.path = rawArgs[index + 1] ?? null
+      parsedOptions.path = rawArgs[index + 1] ?? null
       index += 1
       continue
     }
 
     if (value === '--type-name') {
-      options.typeName = rawArgs[index + 1] ?? null
+      parsedOptions.typeName = rawArgs[index + 1] ?? null
       index += 1
       continue
     }
 
     if (value === '--output-file') {
-      options.outputFile = rawArgs[index + 1] ?? null
+      parsedOptions.outputFile = rawArgs[index + 1] ?? null
       index += 1
       continue
     }
 
     if (value === '--replace-pattern') {
-      options.replacePattern = rawArgs[index + 1] ?? null
+      parsedOptions.replacePattern = rawArgs[index + 1] ?? null
       index += 1
       continue
     }
@@ -86,23 +82,23 @@ function parseArgs(rawArgs) {
     positional.push(value)
   }
 
-  if (!options.path) {
-    options.path = positional[0] ?? null
+  if (!parsedOptions.path) {
+    parsedOptions.path = positional[0] ?? null
   }
 
-  if (!options.typeName) {
-    options.typeName = positional[1] ?? null
+  if (!parsedOptions.typeName) {
+    parsedOptions.typeName = positional[1] ?? null
   }
 
-  if (!options.outputFile) {
-    options.outputFile = positional[2] ?? null
+  if (!parsedOptions.outputFile) {
+    parsedOptions.outputFile = positional[2] ?? null
   }
 
-  if (!options.replacePattern) {
-    options.replacePattern = positional[3] ?? null
+  if (!parsedOptions.replacePattern) {
+    parsedOptions.replacePattern = positional[3] ?? null
   }
 
-  return options
+  return parsedOptions
 }
 
 function parseReplacePattern(value) {

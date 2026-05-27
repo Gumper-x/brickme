@@ -5,10 +5,29 @@ import { fileURLToPath } from 'url'
 
 import { ensureAiContext, getAiContextState } from './ai-context.js'
 import { translateBatch } from './ai.js'
-import { getTranslationPaths, listWorkspaceFiles, sortObjectKeys } from './utils.js'
+import { buildTranslateHelp, parseTranslateRuntimeArgs, setTranslateRuntimeConfig } from './runtime-config.js'
+import { getTranslationPaths, listWorkspaceFiles, sortObjectKeys, stringifySortedJson } from './utils.js'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
 const workspaceRoot = resolve(currentDir, '../../../..')
+const rawArgs = process.argv.slice(3)
+
+if (rawArgs.includes('--help') || rawArgs.includes('-h')) {
+  console.log(buildTranslateHelp())
+  process.exit(0)
+}
+
+const { options } = parseTranslateRuntimeArgs(rawArgs)
+
+try {
+  setTranslateRuntimeConfig(options)
+} catch (error) {
+  console.error(error instanceof Error ? error.message : String(error))
+  console.error('')
+  console.error(buildTranslateHelp())
+  process.exit(1)
+}
+
 const DEFAULT_LANGUAGE_CODES = [
   'bn',
   'cz',
@@ -49,6 +68,15 @@ const languageCodes = [
   ]),
 ].sort()
 
+const samplePaths = globSync(
+  '{packages/brick,apps/*}/{components/**/translate,pages-translate/*,layouts/**,global/*}/sample.json',
+  {
+    absolute: true,
+    cwd: workspaceRoot,
+    ignore: ['**/node_modules/**', '**/.nuxt/**', '**/dist/**', '**/.output/**', '**/coverage/**', '**/public/**'],
+  },
+).sort()
+
 const sourceFiles = listWorkspaceFiles(workspaceRoot).filter(
   (filePath) => /\.(?:js|ts|vue)$/.test(filePath) && !filePath.endsWith('.d.ts'),
 )
@@ -62,8 +90,6 @@ for (const sourceFilePath of sourceFiles) {
     sampleToSource.set(samplePath, sourceFilePath)
   }
 }
-
-const samplePaths = [...sampleToSource.keys()].sort()
 
 const tasks = samplePaths.map((samplePath) => ({
   sample: readJson(samplePath),
@@ -88,22 +114,22 @@ console.log(
   `✅ Done: ${samplePaths.length} sample folders, ${languageCodes.length} languages, batch=${BATCH_MAX_ITEMS}/${BATCH_MAX_CHARS}`,
 )
 
-function createProgress(total) {
+function createProgress(totalCount) {
   let done = 0
   let lastRenderedAt = 0
   const start = Date.now()
 
   return function update(languageCode, samplePath) {
-    done++
+    done += 1
 
     const now = Date.now()
-    if (done !== total && now - lastRenderedAt < 80) {
+    if (done !== totalCount && now - lastRenderedAt < 80) {
       return
     }
 
     lastRenderedAt = now
 
-    const percent = total === 0 ? 100 : Math.round((done * 100) / total)
+    const percent = totalCount === 0 ? 100 : Math.round((done * 100) / totalCount)
     const filled = Math.round(percent / 5)
     const empty = 20 - filled
     const elapsed = ((now - start) / 1000).toFixed(1)
@@ -111,7 +137,7 @@ function createProgress(total) {
 
     process.stdout.write(
       `\r🌍 Translation: [${'█'.repeat(filled)}${' '.repeat(empty)}] ` +
-        `${percent}% (${done}/${total}) ` +
+        `${percent}% (${done}/${totalCount}) ` +
         `⏱ ${elapsed}s ` +
         `\x1b[90m${languageCode} ${shortName}\x1b[0m\x1b[K`,
     )
@@ -135,7 +161,13 @@ function existsJson(filePath) {
   return fs.existsSync(filePath)
 }
 
+function normalizeEol(content) {
+  return String(content).replace(/\r\n/g, '\n')
+}
+
 async function processSample({ sample, samplePath, sourceFilePath }) {
+  writeSortedJsonIfNeeded(samplePath, sample)
+
   const generatedDir = join(dirname(samplePath), 'generated')
   const enPath = join(generatedDir, 'en.json')
   const currentEn = existsJson(enPath) ? readJson(enPath) : {}
@@ -246,7 +278,7 @@ async function processSample({ sample, samplePath, sourceFilePath }) {
   for (const languageCode of languageCodes) {
     const generatedPath = join(generatedDir, `${languageCode}.json`)
     const languageResult = sortObjectKeys(resultByLanguage.get(languageCode) ?? {})
-    writeTextPreservingEol(generatedPath, JSON.stringify(languageResult, null, 2))
+    writeTextPreservingEol(generatedPath, stringifySortedJson(languageResult))
   }
 }
 
@@ -301,8 +333,6 @@ function splitIntoBatches(entries, maxItems, maxChars) {
 
 async function translateChunk(entries, samplePath, targetLocales, componentContext) {
   try {
-    console.log(entries)
-
     return await translateBatch(entries, {
       componentContext,
       sourceLocale: 'en',
@@ -313,6 +343,15 @@ async function translateChunk(entries, samplePath, targetLocales, componentConte
       `Translation failed for ${relative(workspaceRoot, samplePath)} (${entries.length} strings, ${targetLocales.join(', ')})`,
       { cause: error },
     )
+  }
+}
+
+function writeSortedJsonIfNeeded(filePath, value) {
+  const nextText = stringifySortedJson(value)
+  const prevText = fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf-8') : null
+
+  if (prevText === null || normalizeEol(prevText) !== normalizeEol(nextText)) {
+    writeTextPreservingEol(filePath, nextText)
   }
 }
 

@@ -263,8 +263,28 @@ export function shortHash(input) {
   return createHash('md5').update(input).digest('hex').slice(0, 4)
 }
 
+export function sortJsonValue(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => sortJsonValue(item))
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value)
+        .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
+        .map(([key, item]) => [key, sortJsonValue(item)]),
+    )
+  }
+
+  return value
+}
+
 export function sortObjectKeys(value) {
   return Object.fromEntries(Object.entries(value).sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey)))
+}
+
+export function stringifySortedJson(value) {
+  return `${JSON.stringify(sortJsonValue(value), null, 2)}\n`
 }
 
 export function toPageName(input) {

@@ -5,13 +5,18 @@ import { dirname, join, relative, resolve } from 'path'
 import { fileURLToPath } from 'url'
 
 import { generateContentWithLimits } from './gemini.js'
-import { getTranslationPaths, listWorkspaceFiles } from './utils.js'
+import {
+  buildTranslateHelp,
+  DEFAULT_CONTEXT_MODEL,
+  getTranslateRuntimeConfig,
+  parseTranslateRuntimeArgs,
+  setTranslateRuntimeConfig,
+} from './runtime-config.js'
+import { getTranslationPaths, listWorkspaceFiles, stringifySortedJson } from './utils.js'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
 const workspaceRoot = resolve(currentDir, '../../../..')
 const CONTEXT_FILE_NAME = 'ai-context.json'
-const CONTEXT_MODEL =
-  process.env.TRANSLATE_CONTEXT_AI_MODEL || process.env.TRANSLATE_AI_MODEL || 'gemini-3.1-flash-lite-preview'
 const CHANGE_THRESHOLD = readFloat('TRANSLATE_CONTEXT_MIN_CHANGE', 0.3)
 const SOURCE_MAX_CHARS = readPositiveInt('TRANSLATE_CONTEXT_SOURCE_MAX_CHARS', 16000)
 
@@ -55,7 +60,7 @@ export async function ensureAiContext({ force = false, sample, samplePath, sourc
     version: 1,
   }
 
-  writeTextPreservingEol(state.contextPath, `${JSON.stringify(next, null, 2)}\n`)
+  writeTextPreservingEol(state.contextPath, stringifySortedJson(next))
 
   return description
 }
@@ -121,9 +126,17 @@ function buildContextContents({ sampleEntries, samplePath, sourceCode, sourceFil
 }
 
 function buildContextSystemInstruction() {
+  const { productContext, terminology, tone } = getTranslateRuntimeConfig()
+
   return [
     'You are generating translation context for a UI component.',
     'Write a compact but informative description for translators.',
+    'Product context:',
+    productContext,
+    'Terminology:',
+    terminology,
+    'Tone:',
+    tone,
     'Focus on:',
     '- what the component or page does',
     '- main user actions',
@@ -163,6 +176,7 @@ async function generateContextDescription({ sample, samplePath, sourceCode, sour
       text,
     }))
   const responseText = await generateContentWithLimits({
+    apiKey: getTranslateRuntimeConfig().apiKey,
     config: {
       systemInstruction: buildContextSystemInstruction(),
     },
@@ -172,7 +186,7 @@ async function generateContextDescription({ sample, samplePath, sourceCode, sour
       sourceCode: sourceCode.slice(0, SOURCE_MAX_CHARS),
       sourceFilePath: relative(workspaceRoot, sourceFilePath),
     }),
-    model: CONTEXT_MODEL,
+    model: getTranslateRuntimeConfig().contextModel || DEFAULT_CONTEXT_MODEL,
   })
 
   return cleanText(responseText)
@@ -238,9 +252,26 @@ function readPositiveInt(name, fallback) {
 }
 
 async function runCli() {
-  const args = process.argv.slice(2)
-  const force = args.includes('--force')
-  const sampleArgs = args.filter((arg) => arg !== '--force')
+  const rawArgs = process.argv.slice(2)
+
+  if (rawArgs.includes('--help') || rawArgs.includes('-h')) {
+    console.log(`${buildTranslateHelp('node packages/cli/src/translate/ai-context.js')}\n\nExtra:\n  --force`)
+    process.exit(0)
+  }
+
+  const force = rawArgs.includes('--force')
+  const filteredArgs = rawArgs.filter((arg) => arg !== '--force')
+  const { options, positional } = parseTranslateRuntimeArgs(filteredArgs)
+
+  try {
+    setTranslateRuntimeConfig(options)
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error))
+    console.error('')
+    console.error(`${buildTranslateHelp('node packages/cli/src/translate/ai-context.js')}\n\nExtra:\n  --force`)
+    process.exit(1)
+  }
+
   const sourceFiles = listWorkspaceFiles(workspaceRoot).filter(
     (filePath) => /\.(?:js|ts|vue)$/.test(filePath) && !filePath.endsWith('.d.ts'),
   )
@@ -255,8 +286,8 @@ async function runCli() {
   }
 
   const targetSamplePaths =
-    sampleArgs.length > 0
-      ? sampleArgs.map((samplePath) => resolve(workspaceRoot, samplePath))
+    positional.length > 0
+      ? positional.map((samplePath) => resolve(workspaceRoot, samplePath))
       : [...sampleToSource.keys()].sort()
 
   for (const samplePath of targetSamplePaths) {

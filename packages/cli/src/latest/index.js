@@ -4,6 +4,18 @@ import { globSync } from 'glob'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
+const args = process.argv.slice(3)
+
+if (args.includes('--help') || args.includes('-h')) {
+  printHelp()
+  process.exit(0)
+}
+
+if (args.length > 0) {
+  printHelp()
+  process.exit(1)
+}
+
 const currentDir = path.dirname(fileURLToPath(import.meta.url))
 const workspaceRoot = path.resolve(currentDir, '../../../..')
 const packageJsonPaths = globSync('**/package.json', {
@@ -35,59 +47,59 @@ for await (const packageJsonPath of packageJsonPaths) {
 process.stdout.write('\n')
 console.log('\x1b[0m', '')
 
-async function updateJson(jsonData) {
-  let counter = 0
-  const maxCount =
-    Object.keys(jsonData.devDependencies || {}).length + Object.keys(jsonData.dependencies || {}).length
-
-  for (const [key, value] of Object.entries(jsonData.dependencies || {})) {
-    if (isWorkspaceVersion(value)) {
-      counter += 1
-      continue
-    }
-
-    exec(`npm view ${key} version`, (error, stdout) => {
-      counter += 1
-
-      if (error) {
-        console.info(error.message)
-        return
-      }
-
-      jsonData.dependencies[key] = String(stdout).trim().replace('\n', '')
-    })
-  }
-
-  for (const [key, value] of Object.entries(jsonData.devDependencies || {})) {
-    if (isWorkspaceVersion(value)) {
-      counter += 1
-      continue
-    }
-
-    exec(`npm view ${key} version`, (error, stdout) => {
-      counter += 1
-
-      if (error) {
-        console.info(error.message)
-        return
-      }
-
-      jsonData.devDependencies[key] = String(stdout).trim().replace('\n', '')
-    })
-  }
-
-  const op = new Promise((resolve) => {
-    const timer = setInterval(() => {
-      if (counter === maxCount) {
-        resolve(jsonData)
-        clearInterval(timer)
-      }
-    }, 300)
-  })
-
-  return await op
-}
-
 function isWorkspaceVersion(value) {
   return value === 'workspace:*' || value === 'workspace: *'
+}
+
+function printHelp() {
+  console.log(`brick latest
+
+Usage:
+  brick latest
+
+  Notes:
+  Scans all package.json files in the repository, including the root one
+  Updates dependencies and devDependencies to the latest npm versions
+  Skips workspace:* versions`)
+}
+
+function readLatestVersion(packageName) {
+  return new Promise((resolve) => {
+    exec(`npm view ${packageName} version`, (error, stdout) => {
+      if (error) {
+        console.info(error.message)
+        resolve(null)
+        return
+      }
+
+      resolve(String(stdout).trim().replace('\n', ''))
+    })
+  })
+}
+
+async function updateJson(jsonData) {
+  await Promise.all([
+    ...Object.entries(jsonData.dependencies || {}).map(async ([key, value]) => {
+      if (isWorkspaceVersion(value)) {
+        return
+      }
+
+      const version = await readLatestVersion(key)
+
+      if (version) {
+        jsonData.dependencies[key] = version
+      }
+    }),
+    ...Object.entries(jsonData.devDependencies || {}).map(async ([key, value]) => {
+      if (isWorkspaceVersion(value)) {
+        return
+      }
+
+      const version = await readLatestVersion(key)
+
+      if (version) {
+        jsonData.devDependencies[key] = version
+      }
+    }),
+  ])
 }

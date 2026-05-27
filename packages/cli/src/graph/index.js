@@ -3,6 +3,18 @@ import { globSync } from 'glob'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
+const args = process.argv.slice(3)
+
+if (args.includes('--help') || args.includes('-h')) {
+  printHelp()
+  process.exit(0)
+}
+
+if (args.length > 0) {
+  printHelp()
+  process.exit(1)
+}
+
 const currentDir = path.dirname(fileURLToPath(import.meta.url))
 const workspaceRoot = path.resolve(currentDir, '../../../..')
 const packageJsonPaths = globSync('**/package.json', {
@@ -52,4 +64,15 @@ function getPackageLabel(packageJsonPath) {
   const packageDir = path.dirname(relativePath)
 
   return packageDir === '.' ? 'root' : packageDir
+}
+
+function printHelp() {
+  console.log(`brick graph
+
+Usage:
+  brick graph
+
+Notes:
+  Scans all package.json files in the repository, including the root one
+  Prints only dependencies that have different versions across packages`)
 }
