@@ -1,5 +1,13 @@
 # @brickflow/ui
 
+## 0.0.7
+
+### Patch Changes
+
+- CLI command base
+- Updated dependencies
+  - @brickflow/utils@0.0.7
+
 ## 0.0.6
 
 ### Patch Changes
