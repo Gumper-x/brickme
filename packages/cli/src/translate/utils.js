@@ -235,28 +235,6 @@ export function getTranslationPaths(id) {
   }
 }
 
-export function listWorkspaceFiles(workspaceRoot) {
-  try {
-    const output = execFileSync('git', ['ls-files', '-co', '--exclude-standard', '-z'], {
-      cwd: workspaceRoot,
-      encoding: 'utf-8',
-    })
-
-    return output
-      .split('\0')
-      .filter(Boolean)
-      .map((file) => resolve(workspaceRoot, file))
-      .filter((filePath) => existsSync(filePath))
-  } catch {
-    return globSync('**/*', {
-      absolute: true,
-      cwd: workspaceRoot,
-      ignore: IGNORED_GLOB_PATTERNS,
-      nodir: true,
-    })
-  }
-}
-
 export function listTranslationSamplePaths(workspaceRoot) {
   return globSync(TRANSLATION_SAMPLE_GLOB, {
     absolute: true,
@@ -284,6 +262,28 @@ export function listTranslationTargets(workspaceRoot) {
     samplePath,
     sourceFilePath: sampleToSource.get(samplePath),
   }))
+}
+
+export function listWorkspaceFiles(workspaceRoot) {
+  try {
+    const output = execFileSync('git', ['ls-files', '-co', '--exclude-standard', '-z'], {
+      cwd: workspaceRoot,
+      encoding: 'utf-8',
+    })
+
+    return output
+      .split('\0')
+      .filter(Boolean)
+      .map((file) => resolve(workspaceRoot, file))
+      .filter((filePath) => existsSync(filePath))
+  } catch {
+    return globSync('**/*', {
+      absolute: true,
+      cwd: workspaceRoot,
+      ignore: IGNORED_GLOB_PATTERNS,
+      nodir: true,
+    })
+  }
 }
 
 export function normalize(input) {

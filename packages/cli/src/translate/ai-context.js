@@ -20,6 +20,10 @@ const CONTEXT_FILE_NAME = 'ai-context.json'
 const CHANGE_THRESHOLD = readFloat('TRANSLATE_CONTEXT_MIN_CHANGE', 0.3)
 const SOURCE_MAX_CHARS = readPositiveInt('TRANSLATE_CONTEXT_SOURCE_MAX_CHARS', 16000)
 
+export function buildAiContextHelp(command = 'brick translate-context') {
+  return `${buildTranslateHelp(command)}\n\nExtra:\n  --force`
+}
+
 export function calculateChangeRatio(previousSource, nextSource) {
   const before = normalizeSource(previousSource)
   const after = normalizeSource(nextSource)
@@ -110,6 +114,52 @@ export function getAiContextState({ force = false, samplePath, sourceFilePath })
 
 export function getContextFilePath(samplePath) {
   return join(dirname(samplePath), CONTEXT_FILE_NAME)
+}
+
+export async function runAiContextCli(rawArgs = process.argv.slice(3), command = 'brick translate-context') {
+  const helpText = buildAiContextHelp(command)
+
+  if (rawArgs.includes('--help') || rawArgs.includes('-h')) {
+    console.log(helpText)
+    process.exit(0)
+  }
+
+  const force = rawArgs.includes('--force')
+  const filteredArgs = rawArgs.filter((arg) => arg !== '--force')
+  const { options, positional } = parseTranslateRuntimeArgs(filteredArgs)
+
+  try {
+    setTranslateRuntimeConfig(options)
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error))
+    console.error('')
+    console.error(helpText)
+    process.exit(1)
+  }
+
+  const targets = listTranslationTargets(workspaceRoot)
+  const requestedSamplePaths =
+    positional.length > 0 ? new Set(positional.map((samplePath) => resolve(workspaceRoot, samplePath))) : null
+  const targetEntries = requestedSamplePaths
+    ? targets.filter(({ samplePath }) => requestedSamplePaths.has(samplePath))
+    : targets
+
+  for (const { samplePath, sourceFilePath } of targetEntries) {
+    if (!sourceFilePath || !fs.existsSync(samplePath)) {
+      continue
+    }
+
+    const description = await ensureAiContext({
+      force,
+      sample: JSON.parse(fs.readFileSync(samplePath, 'utf-8')),
+      samplePath,
+      sourceFilePath,
+    })
+
+    if (description) {
+      console.log(`🧠 Context updated: ${relative(workspaceRoot, samplePath)}`)
+    }
+  }
 }
 
 function buildContextContents({ sampleEntries, samplePath, sourceCode, sourceFilePath }) {
@@ -249,56 +299,6 @@ function readPositiveInt(name, fallback) {
 
   const value = Number.parseInt(raw, 10)
   return Number.isFinite(value) && value > 0 ? value : fallback
-}
-
-export function buildAiContextHelp(command = 'brick translate-context') {
-  return `${buildTranslateHelp(command)}\n\nExtra:\n  --force`
-}
-
-export async function runAiContextCli(rawArgs = process.argv.slice(3), command = 'brick translate-context') {
-  const helpText = buildAiContextHelp(command)
-
-  if (rawArgs.includes('--help') || rawArgs.includes('-h')) {
-    console.log(helpText)
-    process.exit(0)
-  }
-
-  const force = rawArgs.includes('--force')
-  const filteredArgs = rawArgs.filter((arg) => arg !== '--force')
-  const { options, positional } = parseTranslateRuntimeArgs(filteredArgs)
-
-  try {
-    setTranslateRuntimeConfig(options)
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : String(error))
-    console.error('')
-    console.error(helpText)
-    process.exit(1)
-  }
-
-  const targets = listTranslationTargets(workspaceRoot)
-  const requestedSamplePaths =
-    positional.length > 0 ? new Set(positional.map((samplePath) => resolve(workspaceRoot, samplePath))) : null
-  const targetEntries = requestedSamplePaths
-    ? targets.filter(({ samplePath }) => requestedSamplePaths.has(samplePath))
-    : targets
-
-  for (const { samplePath, sourceFilePath } of targetEntries) {
-    if (!sourceFilePath || !fs.existsSync(samplePath)) {
-      continue
-    }
-
-    const description = await ensureAiContext({
-      force,
-      sample: JSON.parse(fs.readFileSync(samplePath, 'utf-8')),
-      samplePath,
-      sourceFilePath,
-    })
-
-    if (description) {
-      console.log(`🧠 Context updated: ${relative(workspaceRoot, samplePath)}`)
-    }
-  }
 }
 
 function writeTextPreservingEol(filePath, content) {

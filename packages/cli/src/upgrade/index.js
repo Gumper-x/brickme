@@ -139,10 +139,6 @@ function updateDependencySections(packageJson, latestVersionsMap) {
   }
 }
 
-function writeJson(filePath, value) {
-  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`)
-}
-
 function walkDirectoryForPackageJson(directoryPath) {
   const entries = fs.readdirSync(directoryPath, { withFileTypes: true })
   const filePaths = []
@@ -165,4 +161,8 @@ function walkDirectoryForPackageJson(directoryPath) {
   }
 
   return filePaths
+}
+
+function writeJson(filePath, value) {
+  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`)
 }
