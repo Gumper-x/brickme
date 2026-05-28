@@ -10,10 +10,24 @@ const commandsDir = path.join(cliDir, 'src')
 async function getAvailableCommands() {
   const entries = await readdir(commandsDir, { withFileTypes: true })
 
-  return entries
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort()
+  const commands = await Promise.all(
+    entries
+      .filter((entry) => entry.isDirectory())
+      .map(async (entry) => ((await hasCommandEntry(entry.name)) ? entry.name : null)),
+  )
+
+  return commands.filter(Boolean).sort()
+}
+
+async function hasCommandEntry(command) {
+  const commandEntry = path.join(commandsDir, command, 'index.js')
+
+  try {
+    await access(commandEntry)
+    return true
+  } catch {
+    return false
+  }
 }
 
 function isValidCommandName(command) {
@@ -45,14 +59,11 @@ async function runCommand(command) {
     return false
   }
 
-  const commandEntry = path.join(commandsDir, command, 'index.js')
-
-  try {
-    await access(commandEntry)
-  } catch {
+  if (!(await hasCommandEntry(command))) {
     return false
   }
 
+  const commandEntry = path.join(commandsDir, command, 'index.js')
   await import(pathToFileURL(commandEntry).href)
   return true
 }

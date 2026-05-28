@@ -1,5 +1,11 @@
 # @brickflow/utils
 
+## 0.0.10
+
+### Patch Changes
+
+- Remove cli upgrade
+
 ## 0.0.9
 
 ### Patch Changes
