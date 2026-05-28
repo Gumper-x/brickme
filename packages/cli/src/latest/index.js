@@ -1,8 +1,8 @@
 import { exec } from 'child_process'
 import fs from 'fs'
 import { globSync } from 'glob'
-import path from 'path'
-import { fileURLToPath } from 'url'
+
+import { resolveWorkspaceRoot } from '../shared/workspace-root.js'
 
 const args = process.argv.slice(3)
 
@@ -16,8 +16,7 @@ if (args.length > 0) {
   process.exit(1)
 }
 
-const currentDir = path.dirname(fileURLToPath(import.meta.url))
-const workspaceRoot = path.resolve(currentDir, './')
+const workspaceRoot = resolveWorkspaceRoot()
 const packageJsonPaths = globSync('**/package.json', {
   absolute: true,
   cwd: workspaceRoot,

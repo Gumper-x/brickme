@@ -1,5 +1,11 @@
 # @brickflow/lint
 
+## 0.0.9
+
+### Patch Changes
+
+- fix entry cd
+
 ## 0.0.8
 
 ### Patch Changes
