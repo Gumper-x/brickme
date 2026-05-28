@@ -33,7 +33,7 @@
     "@brickflow/lint": "workspace:*",
     "@brickflow/prettier": "workspace:*",
     "@types/big.js": "7.0.0",
-    "rolldown": "1.0.2",
+    "rolldown": "1.0.3",
     "rolldown-plugin-dts": "0.25.1"
   },
   "author": "",
@@ -41,6 +41,6 @@
   "dependencies": {
     "big.js": "7.0.1",
     "browser-image-compression": "2.0.2",
-    "heic-to": "1.4.3"
+    "heic-to": "1.5.2"
   }
 }

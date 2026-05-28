@@ -17,7 +17,7 @@ if (args.length > 0) {
 }
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url))
-const workspaceRoot = path.resolve(currentDir, '../../../..')
+const workspaceRoot = path.resolve(currentDir, './')
 const packageJsonPaths = globSync('**/package.json', {
   absolute: true,
   cwd: workspaceRoot,

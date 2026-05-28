@@ -15,16 +15,16 @@
     "format:check": "pnpm exec prettier . --ignore-path ../../.prettierignore --check"
   },
   "dependencies": {
-    "@babel/parser": "^7.29.7",
-    "@babel/traverse": "^7.29.7",
-    "@babel/types": "^7.29.7",
-    "@google/genai": "^2.6.0",
-    "@vue/compiler-sfc": "^3.5.35",
-    "fantasticon": "^4.1.0",
-    "glob": "^13.0.6",
-    "looks-same": "^10.0.1",
-    "sharp": "^0.34.5",
-    "svgo": "^4.0.1"
+    "@babel/parser": "7.29.7",
+    "@babel/traverse": "7.29.7",
+    "@babel/types": "7.29.7",
+    "@google/genai": "2.6.0",
+    "@vue/compiler-sfc": "3.5.35",
+    "fantasticon": "4.1.0",
+    "glob": "13.0.6",
+    "looks-same": "10.0.1",
+    "sharp": "0.34.5",
+    "svgo": "4.0.1"
   },
   "publishConfig": {
     "access": "public"
