@@ -3,10 +3,10 @@ import { globSync } from 'glob'
 import { dirname, join, relative, resolve } from 'path'
 import { fileURLToPath } from 'url'
 
-import { ensureAiContext, getAiContextState } from './ai-context.js'
+import { getAiContextState } from './ai-context.js'
 import { translateBatch } from './ai.js'
 import { buildTranslateHelp, parseTranslateRuntimeArgs, setTranslateRuntimeConfig } from './runtime-config.js'
-import { getTranslationPaths, listWorkspaceFiles, sortObjectKeys, stringifySortedJson } from './utils.js'
+import { listTranslationTargets, sortObjectKeys, stringifySortedJson } from './utils.js'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
 const workspaceRoot = resolve(currentDir, '../../../..')
@@ -68,33 +68,10 @@ const languageCodes = [
   ]),
 ].sort()
 
-const samplePaths = globSync(
-  '{packages/brick,apps/*}/{components/**/translate,pages-translate/*,layouts/**,global/*}/sample.json',
-  {
-    absolute: true,
-    cwd: workspaceRoot,
-    ignore: ['**/node_modules/**', '**/.nuxt/**', '**/dist/**', '**/.output/**', '**/coverage/**', '**/public/**'],
-  },
-).sort()
-
-const sourceFiles = listWorkspaceFiles(workspaceRoot).filter(
-  (filePath) => /\.(?:js|ts|vue)$/.test(filePath) && !filePath.endsWith('.d.ts'),
-)
-
-const sampleToSource = new Map()
-
-for (const sourceFilePath of sourceFiles) {
-  const samplePath = getTranslationPaths(sourceFilePath)?.samplePath
-
-  if (samplePath && fs.existsSync(samplePath) && !sampleToSource.has(samplePath)) {
-    sampleToSource.set(samplePath, sourceFilePath)
-  }
-}
-
-const tasks = samplePaths.map((samplePath) => ({
+const tasks = listTranslationTargets(workspaceRoot).map(({ samplePath, sourceFilePath }) => ({
   sample: readJson(samplePath),
   samplePath,
-  sourceFilePath: sampleToSource.get(samplePath),
+  sourceFilePath,
 }))
 
 const total = tasks.reduce((count, task) => count + Object.keys(task.sample).length * languageCodes.length, 0)
@@ -111,7 +88,7 @@ for (const task of tasks) {
 
 process.stdout.write('\n')
 console.log(
-  `✅ Done: ${samplePaths.length} sample folders, ${languageCodes.length} languages, batch=${BATCH_MAX_ITEMS}/${BATCH_MAX_CHARS}`,
+  `✅ Done: ${tasks.length} sample folders, ${languageCodes.length} languages, batch=${BATCH_MAX_ITEMS}/${BATCH_MAX_CHARS}`,
 )
 
 function createProgress(totalCount) {
@@ -228,18 +205,10 @@ async function processSample({ sample, samplePath, sourceFilePath }) {
   let componentContext = null
 
   if (pendingEntriesByLocales.size > 0) {
-    const contextState = getAiContextState({
+    componentContext = getAiContextState({
       samplePath,
       sourceFilePath,
-    })
-
-    componentContext = contextState.shouldRegenerate
-      ? await ensureAiContext({
-          sample,
-          samplePath,
-          sourceFilePath,
-        })
-      : contextState.description
+    }).description
   }
 
   for (const [localeKey, entries] of pendingEntriesByLocales) {

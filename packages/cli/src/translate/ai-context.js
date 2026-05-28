@@ -12,7 +12,7 @@ import {
   parseTranslateRuntimeArgs,
   setTranslateRuntimeConfig,
 } from './runtime-config.js'
-import { getTranslationPaths, listWorkspaceFiles, stringifySortedJson } from './utils.js'
+import { listTranslationTargets, stringifySortedJson } from './utils.js'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
 const workspaceRoot = resolve(currentDir, '../../../..')
@@ -251,11 +251,15 @@ function readPositiveInt(name, fallback) {
   return Number.isFinite(value) && value > 0 ? value : fallback
 }
 
-async function runCli() {
-  const rawArgs = process.argv.slice(2)
+export function buildAiContextHelp(command = 'brick translate-context') {
+  return `${buildTranslateHelp(command)}\n\nExtra:\n  --force`
+}
+
+export async function runAiContextCli(rawArgs = process.argv.slice(3), command = 'brick translate-context') {
+  const helpText = buildAiContextHelp(command)
 
   if (rawArgs.includes('--help') || rawArgs.includes('-h')) {
-    console.log(`${buildTranslateHelp('node packages/cli/src/translate/ai-context.js')}\n\nExtra:\n  --force`)
+    console.log(helpText)
     process.exit(0)
   }
 
@@ -268,31 +272,18 @@ async function runCli() {
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error))
     console.error('')
-    console.error(`${buildTranslateHelp('node packages/cli/src/translate/ai-context.js')}\n\nExtra:\n  --force`)
+    console.error(helpText)
     process.exit(1)
   }
 
-  const sourceFiles = listWorkspaceFiles(workspaceRoot).filter(
-    (filePath) => /\.(?:js|ts|vue)$/.test(filePath) && !filePath.endsWith('.d.ts'),
-  )
-  const sampleToSource = new Map()
+  const targets = listTranslationTargets(workspaceRoot)
+  const requestedSamplePaths =
+    positional.length > 0 ? new Set(positional.map((samplePath) => resolve(workspaceRoot, samplePath))) : null
+  const targetEntries = requestedSamplePaths
+    ? targets.filter(({ samplePath }) => requestedSamplePaths.has(samplePath))
+    : targets
 
-  for (const sourceFilePath of sourceFiles) {
-    const samplePath = getTranslationPaths(sourceFilePath)?.samplePath
-
-    if (samplePath && fs.existsSync(samplePath) && !sampleToSource.has(samplePath)) {
-      sampleToSource.set(samplePath, sourceFilePath)
-    }
-  }
-
-  const targetSamplePaths =
-    positional.length > 0
-      ? positional.map((samplePath) => resolve(workspaceRoot, samplePath))
-      : [...sampleToSource.keys()].sort()
-
-  for (const samplePath of targetSamplePaths) {
-    const sourceFilePath = sampleToSource.get(samplePath)
-
+  for (const { samplePath, sourceFilePath } of targetEntries) {
     if (!sourceFilePath || !fs.existsSync(samplePath)) {
       continue
     }
@@ -317,5 +308,5 @@ function writeTextPreservingEol(filePath, content) {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  await runCli()
+  await runAiContextCli(process.argv.slice(2), 'node packages/cli/src/translate/ai-context.js')
 }

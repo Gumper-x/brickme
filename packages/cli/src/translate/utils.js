@@ -19,6 +19,8 @@ const IGNORED_GLOB_PATTERNS = [
   '**/public/**',
 ]
 const IGNORED_SOURCE_SEGMENTS = ['/node_modules/', '/.nuxt/', '/dist/', '/.output/', '/coverage/', '/public/']
+const TRANSLATION_SAMPLE_GLOB =
+  '{packages/brick,apps/*}/{components/**/translate,pages-translate/*,layouts/**,global/*}/sample.json'
 
 export function compileVueToJS(code, filePath) {
   const { descriptor } = parseSFC(code)
@@ -253,6 +255,35 @@ export function listWorkspaceFiles(workspaceRoot) {
       nodir: true,
     })
   }
+}
+
+export function listTranslationSamplePaths(workspaceRoot) {
+  return globSync(TRANSLATION_SAMPLE_GLOB, {
+    absolute: true,
+    cwd: workspaceRoot,
+    ignore: IGNORED_GLOB_PATTERNS,
+  }).sort()
+}
+
+export function listTranslationTargets(workspaceRoot) {
+  const samplePaths = listTranslationSamplePaths(workspaceRoot)
+  const sourceFiles = listWorkspaceFiles(workspaceRoot).filter(
+    (filePath) => /\.(?:js|ts|vue)$/.test(filePath) && !filePath.endsWith('.d.ts'),
+  )
+  const sampleToSource = new Map()
+
+  for (const sourceFilePath of sourceFiles) {
+    const samplePath = getTranslationPaths(sourceFilePath)?.samplePath
+
+    if (samplePath && existsSync(samplePath) && !sampleToSource.has(samplePath)) {
+      sampleToSource.set(samplePath, sourceFilePath)
+    }
+  }
+
+  return samplePaths.map((samplePath) => ({
+    samplePath,
+    sourceFilePath: sampleToSource.get(samplePath),
+  }))
 }
 
 export function normalize(input) {
