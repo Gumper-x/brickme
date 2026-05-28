@@ -1,5 +1,13 @@
 # @brickflow/ui
 
+## 0.0.8
+
+### Patch Changes
+
+- Translate context
+- Updated dependencies
+  - @brickflow/utils@0.0.8
+
 ## 0.0.7
 
 ### Patch Changes

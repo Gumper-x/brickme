@@ -1,5 +1,11 @@
 # @brickflow/lint
 
+## 0.0.8
+
+### Patch Changes
+
+- Translate context
+
 ## 0.0.7
 
 ### Patch Changes
