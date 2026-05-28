@@ -1,5 +1,11 @@
 # @brickflow/prettier
 
+## 0.0.11
+
+### Patch Changes
+
+- Ban defineSlots
+
 ## 0.0.10
 
 ### Patch Changes

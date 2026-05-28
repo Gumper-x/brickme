@@ -133,6 +133,10 @@ const baseRules = {
       message: 'defineEmits is forbidden. Use props or alternative pattern.',
       selector: "CallExpression[callee.name='defineEmits']",
     },
+    {
+      message: 'defineSlots is forbidden. Use props or alternative pattern.',
+      selector: "CallExpression[callee.name='defineSlots']",
+    },
   ],
   'no-return-assign': 'error',
   'no-script-url': 'error',
